@@ -1,0 +1,138 @@
+http://127.0.0.1:8081/wm/core/switch/all/aggregate/json
+
+{  
+   "00:00:00:00:00:00:00:02":{  
+      "aggregate":{  
+         "version":"OF_13",
+         "flow_count":"1",
+         "packet_count":"3740",
+         "byte_count":"636136",
+         "flags":[  
+
+         ]
+      }
+   },
+   "00:00:00:00:00:00:00:03":{  
+      "aggregate":{  
+         "version":"OF_13",
+         "flow_count":"1",
+         "packet_count":"3360",
+         "byte_count":"610786",
+         "flags":[  
+
+         ]
+      }
+   },
+   "00:00:00:00:00:00:00:01":{  
+      "aggregate":{  
+         "version":"OF_13",
+         "flow_count":"1",
+         "packet_count":"3361",
+         "byte_count":"607897",
+         "flags":[  
+
+         ]
+      }
+   }
+}
+
+
+http://127.0.0.1:8081/wm/statistics/bandwidth/00:00:00:00:00:00:00:01/1/json
+
+[  
+   {  
+      "dpid":"00:00:00:00:00:00:00:01",
+      "port":"1",
+      "updated":"Mon Sep 11 21:39:33 CEST 2017",
+      "link-speed-bits-per-second":"10000000",
+      "bits-per-second-rx":"0",
+      "bits-per-second-tx":"235"
+   }
+]
+
+http://127.0.0.1:8081/wm/routing/paths/00:00:00:00:00:00:00:01/00:00:00:00:00:00:00:03/2/json
+
+{  
+   "results":[  
+      {  
+         "src_dpid":"00:00:00:00:00:00:00:01",
+         "dst_dpid":"00:00:00:00:00:00:00:03",
+         "hop_count":"2",
+         "latency":"24",
+         "path_index":"0",
+         "path":[  
+            {  
+               "dpid":"00:00:00:00:00:00:00:01",
+               "port":"2"
+            },
+            {  
+               "dpid":"00:00:00:00:00:00:00:02",
+               "port":"2"
+            },
+            {  
+               "dpid":"00:00:00:00:00:00:00:02",
+               "port":"3"
+            },
+            {  
+               "dpid":"00:00:00:00:00:00:00:03",
+               "port":"2"
+            }
+         ]
+      }
+   ]
+}
+
+http://127.0.0.1:8081/wm/topology/links/json
+
+[
+   {
+      "src-switch":"00:00:00:00:00:00:00:01",
+      "src-port":2,
+      "dst-switch":"00:00:00:00:00:00:00:02",
+      "dst-port":2,
+      "type":"internal",
+      "direction":"bidirectional",
+      "latency":2
+   },
+   {
+      "src-switch":"00:00:00:00:00:00:00:02",
+      "src-port":3,
+      "dst-switch":"00:00:00:00:00:00:00:03",
+      "dst-port":2,
+      "type":"internal",
+      "direction":"bidirectional",
+      "latency":2
+   }
+]
+queue:
+.how to create a queue at the port of the switch
+sudo ovs-vsctl set port s1-eth2 qos=@newqos -- --id=@newqos create qos type=linux-htb other-config:max-rate=5000000 queues:0=@newqueue -- --id=@newqueue create queue other-config:min-rate=3000000 other-config:max-rate=3000000
+
+{
+   "00:00:00:00:00:00:00:02":{
+
+   },
+   "00:00:00:00:00:00:00:03":{
+
+   },
+   "00:00:00:00:00:00:00:01":{
+      "version":"OF_13",
+      "queues":[
+         "duration_nsec"         "591000000",
+         "duration_sec",
+         "1703",
+         "queue_id",
+         "0",
+         "port",
+         "2",
+         "tx_bytes",
+         "524",
+         "tx_errors",
+         "0",
+         "tx_errors",
+         "3"
+      ]
+   }
+}
+
+
