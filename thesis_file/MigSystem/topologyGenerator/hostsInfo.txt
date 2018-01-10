@@ -1,0 +1,123 @@
+link bandwidth
+s8<->s9:10
+s8<->h1:8
+s3<->s6:6
+s3<->h4:3
+s4<->s8:7
+s4<->h7:4
+s2<->s3:5
+s2<->h9:3
+s1<->s4:4
+s1<->h8:2
+s4<->s10:7
+s2<->s10:5
+s6<->s9:8
+s6<->h6:6
+s4<->s5:7
+s5<->s9:8
+s5<->h5:5
+s1<->s8:4
+s6<->s10:9
+s1<->s3:4
+s6<->s7:8
+s4<->s9:6
+s2<->s4:4
+s3<->s10:6
+s1<->s7:4
+s5<->s7:7
+s7<->s10:10
+s7<->h3:7
+s5<->s8:7
+s3<->s4:5
+s5<->s10:8
+s4<->s6:7
+s2<->s5:5
+s3<->s9:6
+s3<->s5:6
+s1<->s6:4
+s2<->s8:5
+s9<->s10:11
+s9<->h10:9
+s5<->s6:8
+s7<->s9:9
+s7<->s8:9
+s4<->s7:6
+s2<->s6:5
+s3<->s8:6
+s1<->s10:4
+s3<->s7:5
+s2<->s9:5
+s6<->s8:8
+s8<->s10:11
+s1<->s5:4
+s1<->s2:4
+s2<->s7:5
+s1<->s9:4
+s10<->h2:10
+connections
+s1-eth2<->h8-eth0
+s1-eth9<->s2-eth9
+s1-eth4<->s3-eth4
+s1-eth1<->s4-eth3
+s1-eth8<->s5-eth10
+s1-eth6<->s6-eth7
+s1-eth5<->s7-eth2
+s1-eth3<->s8-eth4
+s1-eth10<->s9-eth10
+s1-eth7<->s10-eth8
+s2-eth2<->h9-eth0
+s2-eth1<->s3-eth3
+s2-eth4<->s4-eth7
+s2-eth5<->s5-eth7
+s2-eth7<->s6-eth9
+s2-eth10<->s7-eth10
+s2-eth6<->s8-eth6
+s2-eth8<->s9-eth9
+s2-eth3<->s10-eth2
+s3-eth2<->h4-eth0
+s3-eth6<->s4-eth8
+s3-eth8<->s5-eth8
+s3-eth1<->s6-eth1
+s3-eth10<->s7-eth9
+s3-eth9<->s8-eth8
+s3-eth7<->s9-eth5
+s3-eth5<->s10-eth4
+s4-eth2<->h7-eth0
+s4-eth5<->s5-eth1
+s4-eth9<->s6-eth6
+s4-eth10<->s7-eth8
+s4-eth1<->s8-eth3
+s4-eth6<->s9-eth4
+s4-eth4<->s10-eth1
+s5-eth3<->h5-eth0
+s5-eth9<->s6-eth8
+s5-eth4<->s7-eth3
+s5-eth5<->s8-eth5
+s5-eth2<->s9-eth3
+s5-eth6<->s10-eth6
+s6-eth3<->h6-eth0
+s6-eth5<->s7-eth1
+s6-eth10<->s8-eth9
+s6-eth2<->s9-eth2
+s6-eth4<->s10-eth3
+s7-eth5<->h3-eth0
+s7-eth7<->s8-eth7
+s7-eth6<->s9-eth8
+s7-eth4<->s10-eth5
+s8-eth2<->h1-eth0
+s8-eth1<->s9-eth1
+s8-eth10<->s10-eth9
+s9-eth7<->h10-eth0
+s9-eth6<->s10-eth7
+s10-eth10<->h2-eth0
+IP
+h1 10.0.0.1
+h2 10.0.0.2
+h3 10.0.0.3
+h4 10.0.0.4
+h5 10.0.0.5
+h6 10.0.0.6
+h7 10.0.0.7
+h8 10.0.0.8
+h9 10.0.0.9
+h10 10.0.0.10
