@@ -1,0 +1,7 @@
+port=8088
+MininetWorkDir=/home/xu/mininet/H1Dir
+password=123
+container=iperfserver
+image=mywebserver
+restartDir=/home/xu/mininet/H2Dir
+logfileDir=/tmp
