@@ -1,0 +1,211 @@
+#!/usr/bin/python
+
+"""
+This imports config from a VirtualNetworkGraph.py .out file and creates
+a network with the same node connectivity.
+"""
+import sys
+import time
+
+from mininet.net import Mininet
+from mininet.cli import CLI
+from mininet.log import setLogLevel, info
+from mininet.link import TCLink
+from mininet.topo import Topo
+from mininet.util import dumpNodeConnections
+from mininet.node import Controller, RemoteController, OVSSwitch
+
+#import networkx as nx
+import pickle
+
+from random import randint
+import thread
+import socket
+
+from paths import Path
+
+
+s_linkList = {}
+switchList = []
+hostList = []
+h_queue = []
+#paths = []
+#path_costs = {}
+#prev_ema = {}
+
+#FOR FULL OR RANDOM
+class FullTopo(Topo):
+        def build(self, node, hosts, s_links, h_queue):
+                nodes = node[:]
+                currHost = 0
+                for s in range(0,len(nodes)):
+                        self.addSwitch(nodes[s],cls = OVSSwitch, protocols='OpenFlow13')
+                        self.addHost('h'+str(s))
+                #links between switches
+                for key in s_links:
+                        self.addLink(key[0],key[1],bw=s_links[key][0], delay=s_links[key][1], loss=s_links[key][2], max_queue_size=s_links[key][3], use_htb=True)
+                        #links between hosts and switches
+                        if  key[0] in nodes:
+				#print hosts[currHost]+" "+key[0]
+                                self.addLink(key[0],hosts[currHost],max_queue_size=h_queue[currHost],use_htb=True)
+                                nodes.remove(key[0])
+                                currHost = currHost + 1
+                #self.addLink(hosts[currHost],nodes[0],max_queue_size=h_queue[currHost],use_htb=True)
+
+class StarTopo (Topo):
+        def build(self, nodes, hosts, s_links, h_queue):
+                currHost = 0
+                for s in range(0,len(nodes)):
+                        self.addSwitch(nodes[s],cls = OVSSwitch, protocols='OpenFlow13')
+                        self.addHost('h'+str(s+1))
+                for key in s_links:
+                        self.addLink(key[0],key[1],bw=s_links[key][0], delay=s_links[key][1], loss=s_links[key][2], max_queue_size=s_links[key][3], use_htb=True)
+                        self.addLink(hosts[currHost], nodes[currHost+1],max_queue_size=h_queue[currHost],use_htb=True)
+                        currHost = currHost + 1
+                self.addLink(hosts[currHost], nodes[0])
+
+class LinearTopo (Topo):
+        def build(self, nodes, hosts, s_links, h_queue):
+                currHost = 0
+                for s in range(0,len(nodes)):
+                        self.addSwitch(nodes[s],cls = OVSSwitch, protocols='OpenFlow13')
+                        self.addHost('h'+str(s+1))
+                for key in s_links:
+                        self.addLink(key[0],key[1],bw=s_links[key][0], delay=s_links[key][1], loss=s_links[key][2], max_queue_size=s_links[key][3], use_htb=True)
+                        self.addLink(hosts[currHost],nodes[currHost],max_queue_size=h_queue[currHost],use_htb=True)
+                        currHost = currHost + 1
+                # Add last host to last node2 switch...
+                self.addLink(hosts[currHost], nodes[currHost],max_queue_size=h_queue[currHost],use_htb=True)
+
+class DiamondTopo (Topo):
+        def build(self, nodes, hosts, s_links, h_queue):
+                currHost = 0
+                for s in range(0,len(nodes)):
+                        self.addSwitch(nodes[s],cls = OVSSwitch, protocols='OpenFlow13')
+                self.addHost('h1')
+                self.addHost('h2')
+                for key in s_links:
+                        self.addLink(key[0],key[1],bw=s_links[key][0], delay=s_links[key][1], loss=s_links[key][2], max_queue_size=s_links[key][3], use_htb=True)
+                self.addLink('h1','s1', max_queue_size=h_queue[0],use_htb=True)
+                self.addLink('h2','s4', max_queue_size=h_queue[1],use_htb=True)
+
+#def update_link_costs(net,src, dst,bw,d,l):
+def change_link_costs(net):
+
+        for link in s_linkList.keys():
+                s_linkList[link][0] += randint(0,20) - 10
+                while s_linkList[link][0] <= 0:
+                        s_linkList[link][0] += randint(0,10)
+                s_linkList[link][1] = str(int(s_linkList[link][1][:-2])+(randint(0,20) - 10))+'ms'
+                while int(s_linkList[link][1][:-2]) < 0:
+                        s_linkList[link][1] = str(int(s_linkList[link][1][:-2])+randint(0,10))+'ms'
+                s_linkList[link][2] += randint(0,20) - 10
+                while s_linkList[link][2] < 0:
+                        s_linkList[link][2] += randint(0,10)
+
+                src = net.getNodeByName(link[0])
+                dst = net.getNodeByName(link[1])
+                li = src.connectionsTo(dst)
+
+                srcLink = li[0][1]
+                dstLink = li[0][1]
+
+                srcLink.config(bw=s_linkList[link][0], delay=s_linkList[link][1], loss=s_linkList[link][2])
+                dstLink.config(bw=s_linkList[link][0], delay=s_linkList[link][1], loss=s_linkList[link][2])
+
+
+
+def send_new_path(net,s,min_path):
+    while True:
+        time.sleep(10)
+        change_link_costs(net)
+        p = min_path.get_min_path('1','4',s_linkList)
+        if p is not None:
+                data = pickle.dumps(path)
+                s.send(data)
+
+def createNet(filename, li):
+    f = open(filename)
+    links = open(li)
+
+    for line in f:
+        s_link = links.readline()
+        #bw, delay, loss, queue = s_link.split(' ')
+	bw=s_link.split(' ')[0]
+	delay=s_link.split(' ')[1]
+	loss=s_link.split(' ')[2]
+	queue=s_link.split(' ')[3]
+        node1,node2 = line.split()
+        s1 = "s"+str(node1).strip()
+        s2 = "s"+str(node2).strip()
+        s_linkList[(s1,s2)] = [int(bw.strip()),delay.strip()+'ms',int(loss.strip()),int(queue.strip())]
+        if s1 not in switchList:
+            switchList.append(s1)
+        if s2 not in switchList:
+            switchList.append(s2)
+        h1 = "h"+str(node1).strip()
+        h2 = "h"+str(node2).strip()
+        if h1 not in hostList:
+            hostList.append(h1)
+        if h2 not in hostList:
+            hostList.append(h2)
+
+    h = links.readline().split()
+    for q in h:
+        h_queue.append(int(q.strip()))
+
+    f.close()
+    links.close()
+
+    if (filename == "linear.out"):
+        topo = LinearTopo(switchList, hostList, s_linkList, h_queue)
+    elif (filename == "star.out"):
+        topo = StarTopo(switchList, hostList, s_linkList, h_queue)
+    elif (filename == "diamond.out"):
+        topo = DiamondTopo(switchList, hostList, s_linkList, h_queue)
+    else:       #full or random
+        topo = FullTopo(switchList, hostList, s_linkList, h_queue)
+
+   # net = Mininet(topo=topo, link=TCLink, controller=RemoteController)
+    net = Mininet(topo=topo, link=TCLink)
+
+    info( '*** Starting network\n')
+    net.start()
+
+    '''
+    min_path = Path()
+    #create graph, generate paths, initial path costs
+    min_path.create_graph(s_linkList, switchList)
+
+
+    HOST = '127.0.0.1'
+    PORT = 10000
+
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+
+    #connect to server
+    try:
+        s.connect((HOST,PORT))
+    except s.error in msg:
+        print 'Could not connect. Message: ' + msg[1]
+        sys.exit()
+
+    thread.start_new_thread(send_new_path, (net,s,min_path))
+    '''
+
+    info( '*** Running CLI\n' )
+    CLI( net )
+
+    info( '*** Stopping network' )
+    net.stop()
+    #dumpNodeConnections(net.hosts)
+    #h1, h2 = net.getNodeByName('h1','h2')
+    #while True:
+        #net.ping((h1,h2))
+
+
+if __name__ == '__main__':
+
+    setLogLevel( 'info' )
+createNet(sys.argv[1], sys.argv[2])

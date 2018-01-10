@@ -1,0 +1,7 @@
+nodes:10
+topology:full
+alpha:0.34
+node-min:20
+node-max:80
+link-min:10
+link-max:90
