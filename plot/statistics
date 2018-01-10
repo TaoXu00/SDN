@@ -1,0 +1,7 @@
+average migration time:
+Bandwidth: 20.8s
+shortest path: 20.3s
+random:
+10.0.0.2-10.0.0.3 : 34.55s
+10.0.0.2-10.0.0.4 : 34.7s
+10.0.0.2-10.0.0.5 : 12.3s
