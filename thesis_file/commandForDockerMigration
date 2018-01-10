@@ -1,0 +1,9 @@
+/home/xu/mininet/examples/sshd.py
+h1 docker start looper2
+h1 docker checkpoint create --checkpoint-dir=/home/xu/mininet/H1Dir looper2 checkpoint --leave-running
+h1 scp -r /home/xu/mininet/H1Dir/6b80b035e426c06470c8b8e22552862410f057dd39116d1402fdab10a765b449/checkpoints/checkpoint xu@10.0.0.2:/home/xu/mininet/H2Dir
+h2 docker create --name looper-clone2 busybox
+h2 docker start --checkpoint-dir=/home/xu/mininet/H2Dir --checkpoint=checkpoint looper-clone2
+h1 docker stop looper2
+
+
