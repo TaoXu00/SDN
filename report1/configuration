@@ -1,0 +1,5 @@
+port=8088
+serverdeployRatio=0.5
+policy=shortest 
+image=xutao6688/iperfserver
+container=iperfserver
